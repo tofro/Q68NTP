@@ -22,14 +22,22 @@ CodeStart:
 Start:          JOBSTRT {'NTPClient'},RealStart
                 VERSION {'NTP client for Q68 0.01 alpha'},{'tofro'}
 
-
 RealStart       
                 lea.l   0(a6,a4.l),a6                   ; let a6 point to data space
+
+                moveq   #-1,d1
+                moveq   #IO.OLD,d3
+                lea     hostaddress,a0
+                QDOSOC$ IO.OPEN
+                
+                tst.b   d0
+                bne     errout
                 rts
 
 
+errout
 
-hostname
-                STRING$ {'ntp.org'}
+hostaddress
+                STRING$ {'udp_ntp.org:132'}
                 
                 END
