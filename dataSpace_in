@@ -1,0 +1,131 @@
+*******************************************************************************************
+* dataSpace_in
+*
+* Data space definitions for flappy
+* Also holds some general definitions
+*
+*******************************************************************************************
+
+flappyX         EQU     100
+Flappy_w        EQU     36                      ; size of flappy sprite
+Flappy_h        EQU     24
+BARWIDTH        EQU     40
+viewPortWidth   EQU     511
+viewPortHeight  EQU     383
+topMargin       EQU     20
+BARCOUNT        EQU     4                       ; maximum mumber of bars we can have
+BARDISTANCE     EQU     viewPortWidth/3+70      ; distance between bars
+BARSTARTPOS     EQU     BARCOUNT*BARDISTANCE    ; how far away from 0 the last bar starts
+INITIALGAP      EQU     90                      ; initial minimum gap width
+HORIZON         EQU     viewPortHeight-viewPortHeight/5        ; height of the horizon
+
+GRAVITY         EQU     $e7fff
+BOOST           EQU     -6000                   ; boost in velocity of one flap
+
+* Game state machine states
+GStateBegin     EQU     0                       ; very beginning
+GStateIntro     EQU     1                       ; game shows "Get Ready"
+GStateStart     EQU     2                       ; game starts
+GTransToSail    EQU     3                       ; transit to sailing
+GStateSail      EQU     4                       ; sailing bird 
+GTransToFlap    EQU     5                       ; fransit to flapping
+GStateFlap      EQU     6                       ; flapping bird 
+GStateCrash     EQU     7                       ; crashed, drop down
+GStateEnd       EQU     8                       ; End, wait for key
+
+* Colours:
+*
+* QPC:                  %GGGBBBBBRRRRRGGG
+* Q68:                  %BBBBBRRRRRGGGGGG
+*
+BACKCOL         EQU     $77bf
+                    ;   %0111011110111111       ; lighter green
+SKYCOL          EQU     $1fc6
+                    ;   %0001 1111 1100 0110       ; light blue
+
+BARCOLOUR       EQU     %1110000000000111       ; full green
+
+                OFFSET  0
+
+timerLinkage
+timer_pllk      ds.l    1               ; Polling interrupt linkage
+timer_plad      ds.l    1               ; Polling interrupt service routine address  
+
+channelId       ds.l    1
+dumpChannel     ds.l    1
+screenStart     ds.l    1
+lineLength      ds.w    1
+intCtrAddr      ds.l    1
+ticksMillis     ds.l    1
+lastMoveTicks   ds.l    1
+elapsedTime     ds.l    1
+oldTimer        ds.l    1
+loopCounter     ds.l    1
+
+sysVars         ds.l    1
+
+bckMovSpeed     ds.w    1
+
+score           ds.w    1
+
+flappyYPos      ds.l    1               ; in pixels * 0xffff
+flappyoldYPos   ds.w    1
+flappyYSpeed    ds.l    1               ; in pixels / frame * 0xffff
+flappyYAcc      ds.l    1               ; as an increment of YSpeed, negative flaps upwards
+flappyYGrav     ds.l    1               ; positive pulls down
+
+GamePaused      ds.w    1
+GameState       ds.w    1               ; Game state machine state
+timerRundown    ds.l    1
+
+gapWidth        ds.w    1
+
+barPosTab   
+barPos1X        ds.w    1
+barPos1Y        ds.w    1               ; distance from screenHeight/2 to pos (i.e, half the gap size)
+barPos1Width    ds.w    1
+barPosX         EQU     barPos1X-barPosTab      ; relative offsets
+barPosY         EQU     barPos1Y-barPosTab
+barPosWidth     EQU     barPos1Width-barPosTab
+barPos1End
+BARLENGTH       EQU     barPos1End-barPosTab    
+barPos2X        ds.w    1
+barPos2Y        ds.w    1               ; distance from screenHeight/2 to pos (i.e, half the gap size)
+barPos2Width    ds.w    1
+barPos3X        ds.w    1
+barPos3Y        ds.w    1               ; distance from screenHeight/2 to pos (i.e, half the gap size)
+barPos3Width    ds.w    1
+barPos4X        ds.w    1
+barPos4Y        ds.w    1               ; distance from screenHeight/2 to pos (i.e, half the gap size)
+barPos4Width    ds.w    1
+barPos5X        ds.w    1
+barPos5Y        ds.w    1               ; distance from screenHeight/2 to pos (i.e, half the gap size)
+barPos5Width    ds.w    1
+barPos6X        ds.w    1
+barPos6Y        ds.w    1               ; distance from screenHeight/2 to pos (i.e, half the gap size)
+barPos6Width    ds.w    1
+
+flapped         ds.w    1
+
+w               ds.w    1
+h               ds.w    1
+xOffset         ds.w    1
+yOffset         ds.w    1
+
+done            ds.w    1
+
+
+winLimits
+limitsW         ds.w    1
+limitsH         ds.w    1
+limitsX         ds.w    1
+limitsY         ds.w    1
+
+skyColour       ds.w    1
+floorColour     ds.w    1
+
+hexbufLen       ds.w    1
+hexbuf          ds.b    32
+
+stack           ds.b    30                      ; an auxilary arithmetic stack
+
