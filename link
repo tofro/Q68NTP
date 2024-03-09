@@ -1,10 +1,4 @@
 INPUT *
-INPUT rect_rel
-INPUT vline_rel
-INPUT FlappyRedFlapQPC_rel 
-INPUT FlappyRedQPC_rel
-INPUT GameOverQPC_rel 
-INPUT GetReadyQPC_rel
 
 
-DATA 16384
+DATA 512

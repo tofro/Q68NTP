@@ -5,6 +5,7 @@
 * Also holds some general definitions
 *
 *******************************************************************************************
-
+                OFFSET  0
+                
 channelId       ds.l    1
 
