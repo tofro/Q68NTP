@@ -29,4 +29,6 @@ RealStart
 
 
 
+hostname
+                STRING$ {'ntp.ntp.org'}
                 END
