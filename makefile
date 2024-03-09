@@ -30,12 +30,10 @@ L = win1_assembler_
 #
 
 # All other files
-OBJS = rect_rel vline_rel \
-      FlappyRedFlapQPC_rel FlappyRedQPC_rel \
-      GameOverQPC_rel GetReadyQPC_rel
+OBJS = NTPClient_rel
 
 # The rel file that is the "main program" (and thus goes first...)
-MAIN_OBJ = flappy_rel
+MAIN_OBJ = NTPClient_rel
 
 VER = ver_in
 
@@ -47,10 +45,6 @@ clean:
 #
 # Header file dependencies
 #
-flappy_rel:     dataspace_in flappy_asm debug_mac generic_mac
-rect_rel:       rect_asm generic_mac dataspace_in debug_mac
-vline_rel:      vline_asm generic_mac dataspace_in debug_mac
-flappy_rel:     flappy_asm generic_mac dataspace_in debug_mac
 
 #
 # Rule for turning _asm into _rel files
