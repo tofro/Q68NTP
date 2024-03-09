@@ -30,6 +30,6 @@ RealStart
 
 
 hostname
-                STRING$ {'ntp.ntp.org'}
+                STRING$ {'ntp.org'}
                 
                 END
