@@ -32,12 +32,35 @@ RealStart
                 
                 tst.b   d0
                 bne     errout
-                rts
+                
+                bra     OKExit
 
 
 errout
+                move.l  channelId(a6),a0
+                move.w  UT.ERR,a1
+                jsr     (a1)
+                bra     exitProg
+
+OKExit
+                lea     signoff,a1
+                move.w  (a1)+,d2
+                moveq   #-1,d3
+                QDOSIO$ IO.SSTRG
+exitProg
+                moveq   #-1,d1
+                move.l  #100,d3                 ; wait 2s
+                sub.l   a1,a1
+                QDOSMT$ MT.SUSJB
+
+                moveq   #-1,d1
+                moveq   #0,d3
+                QDOSMT$ MT.FRJOB
+
+                stop                            ; should never be reached
 
 hostaddress
-                STRING$ {'udp_ntp.org:132'}
-                
+                STRING$ {'udp_pool.ntp.org:132'}
+signoff
+                STRING$ {'NTP client exiting'}        
                 END

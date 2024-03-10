@@ -18,7 +18,7 @@ RM   = win1_c68_rm
 # Assembler command line options
 #
 ASMCMD   = -list -link 
-LINK_TARGET = ram1_flappy_exe
+LINK_TARGET = ram1_ntp_exe
 MAPFILE = ram1_flappy_map
 LINK_OPTIONS= -prog ${LINK_TARGET} -list ${MAPFILE} -crf -filetype 1
 

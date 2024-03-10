@@ -5,17 +5,17 @@
 * debug_asm
 * debug print raycaster variables
 *******************************************************************************************
-                        INCLUDE 'win1_assembler_macro_lib'
-                        INCLUDE 'win1_assembler_qdos1_in'
-                        INCLUDE 'win1_assembler_qdos2_in'
+                INCLUDE 'win1_assembler_macro_lib'
+                INCLUDE 'win1_assembler_qdos1_in'
+                INCLUDE 'win1_assembler_qdos2_in'
 
-                        INCLUDE 'dataSpace_in'
-                        INCLUDE 'debug_mac'
+                INCLUDE 'dataSpace_in'
+                INCLUDE 'debug_mac'
 
-                        XDEF    DebOpen
-                        XDEF    DebDump                        
-                        XDEF    DebDump1
-                        XDef    DebClose
+                XDEF    DebOpen
+                XDEF    DebDump                        
+                XDEF    DebDump1
+                XDef    DebClose
 
 DUMPVAR         MACRO   varName
                 EXPAND
@@ -27,11 +27,11 @@ DUMPVAR         MACRO   varName
                 bsr     DebugTab
                 ENDM
                 
-                        SECTION  debug
+                SECTION  debug
 
 
 
-                        dc.w    0
+                dc.w    0
 
 UT.MTEXT        EQU     $d0
 UT.MINT         EQU     $ce
@@ -100,10 +100,10 @@ debdump
 DEBDMPR1    REG     d1-d4
 debdump1         
                 DEBUG   {'debDump1'} 
-                movem.l DEBDMPR1,-(sp)
                 move.l  dumpChannel(a6),a0 
                 lea     DDATitle,a1 
                 bsr     DebugOut
+                movem.l DEBDMPR1,-(sp)
                 DumpVar {mapX}
                 DumpVar {mapY}
                 DumpVar {sideDistX}
