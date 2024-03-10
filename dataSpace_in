@@ -8,6 +8,10 @@
                 OFFSET  0
 
                 COMMON DATA
-                
+
 channelId       ds.l    1
 netChannel      ds.l    1
+retries         ds.w    1
+
+buffLen         EQU     256
+packetBuffer    ds.b    buffLen             ; room for IP packets
