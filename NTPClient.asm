@@ -58,12 +58,12 @@ retrySend
 
                 DEBUG   {'Request sent'}
 
-                move.w  #buffLen,d2
+                move.w  #48,d2
                 lea     connectTO,a0                    ; how long to wait for receiving
                 move.w  (a0),d3
                 move.l  netChannel(a6),a0
                 lea     packetBuffer(a6),a1
-                move.l  #buffLen,d2 
+                move.l  #48,d2 
 
                 QDOSIO$ IO.FSTRG
 
@@ -137,7 +137,8 @@ maxRetries
 connectTO       
                 dc.w    10*50                   ; how long (s) to wait for a connection
 hostaddress
-                STRING$ {'udp_158.101.188.125:132'}
+                STRING$ {'udp_192.168.178.3:123'}
+;                STRING$ {'udp_pool.ntp.org:123'}
   
 requestPacket
                 dc.l    %00011011000011111111111100000000
