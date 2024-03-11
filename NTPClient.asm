@@ -41,7 +41,7 @@ retry
                 cmp.w   retries(a6),d7                  ; number of retries exceeded?
                 beq     errOut
                 moveq   #-1,d1
-                moveq   #IO.SHARE,d3
+                moveq   #IO.SHARE,d3                    ; we're a UDP client
                 lea     hostaddress,a0
                 QDOSOC$ IO.OPEN
           
@@ -61,8 +61,6 @@ retrySend
                 jsr     sendRequest                     ; send the request packet
                 tst.b   d0
                 bne.s   retrySend
-
-                DEBUG   {'Request sent'}
 
                 lea     connectTO,a0                    ; how long to wait for receiving
                 move.w  (a0),d3
@@ -85,12 +83,11 @@ recOK
                 lea     setTime,a1
                 jsr     (a2)
 
-; NTP Times come in seconds since 1.1.1900. QL time is seconds since 1.1.1961 (for  whatever reason)
-; we need to subtract (61*365 + 14 (leap years))*86400 = 2208988800
-DIFFTIME        EQU     1924905600                      ; difference in seconds to 1.1.1961
-                ; EQU     61*365.25*24*60*60            ; difference in seconds to 1.1.1961
+; NTP times come in seconds since 1.1.1900. QL time is seconds since 1.1.1961 (for  whatever reason)
+; we need to subtract (61*365 + 15 (leap years))*86400 = 1924992000
+DIFFTIME        EQU     1924992000                      ; difference in seconds to 1.1.1961
                 sub.l   #DIFFTIME,d7
-                add.l   utcOfs,d7
+                add.l   utcOfs,d7                       ; add time zone offset (NTP delivers UTC)
                 move.l  d7,d1
                 DEBUG   {'Setting time'}
                 QDOSMT$ MT.SCLCK                        ; set the clock
@@ -128,7 +125,6 @@ forever
 
 
 sendRequest
-                DEBUG   {'Preparing request packet'}
                 lea     requestPacket,a1
                 move.w  #requestPacketEnd-requestPacket,d2
                 lea     connectTO,a0                    ; how long to wait for sending
@@ -136,7 +132,6 @@ sendRequest
                 
                 move.l  netChannel(a6),a0
                 QDOSIO$ IO.SSTRG
-                DEBUG   {'request packet sent'}
                 rts
 
 windowDef
