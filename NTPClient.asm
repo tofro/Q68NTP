@@ -24,15 +24,24 @@ Start:          JOBSTRT {'NTPClient'},RealStart
 
 RealStart       
                 lea.l   0(a6,a4.l),a6                   ; let a6 point to data space
+
+                lea     windowDef,a1
+                move.w  UT.CON,a2
+                jsr     (a2)
+
+                move.l  a0,channelId(a6)
+                move.w  UT.MTEXT,a2
+                lea     signon,a1
+                jsr     (a2)
+
                 clr.w   retries(a6)
 retry
-                DEBUG   {'Attempt to connect socket'}
                 add.w   #1,retries(a6)
                 move.w  maxRetries,d7
                 cmp.w   retries(a6),d7                  ; number of retries exceeded?
                 beq     errOut
                 moveq   #-1,d1
-                moveq   #IO.OLD,d3
+                moveq   #IO.SHARE,d3
                 lea     hostaddress,a0
                 QDOSOC$ IO.OPEN
           
@@ -41,24 +50,20 @@ retry
 
                 move.l  a0,netChannel(a6)
 
-                DEBUG   {'Successful connect'}
                 clr.w   retries(a6)
 
 retrySend
                 add.w   #1,retries(a6)
                 move.w  maxRetries,d7
                 cmp.w   retries(a6),d7                  ; number of retries exceeded?
-                beq.s   errOut
+                beq     errOut
 
                 jsr     sendRequest                     ; send the request packet
                 tst.b   d0
                 bne.s   retrySend
-                tst.b   d0
-                bne     errout
 
                 DEBUG   {'Request sent'}
 
-                move.w  #48,d2
                 lea     connectTO,a0                    ; how long to wait for receiving
                 move.w  (a0),d3
                 move.l  netChannel(a6),a0
@@ -66,18 +71,27 @@ retrySend
                 move.l  #48,d2 
 
                 QDOSIO$ IO.FSTRG
+                DEBUG   {'Received answer'}
 
                 cmp.l   #48,d1                          ; if we have 48 bytes or more, we're happy
                 bge.s   recOK
                 bra.s   retrySend                       ; otherwise, send request again
 recOK   
-                DEBUG   {'Received answer'}
                 lea     packetBuffer(a6),a1             ; back to start of buffer
-                move.l  32(a1),d1                       ; get time in seconds since 1.1.1900
+                move.l  32(a1),d7                       ; get time in seconds since 1.1.1900
         
-DIFFTIME        EQU     $726CF4E0                       ; difference in seconds to 1.1.1961
-                ; EQU     61*364.25*24*60*60            ; difference in seconds to 1.1.1961
-                add.l   #DIFFTIME,d1
+                move.l  channelId(a6),a0
+                move.w  UT.MTEXT,a2
+                lea     setTime,a1
+                jsr     (a2)
+
+; NTP Times come in seconds since 1.1.1900. QL time is seconds since 1.1.1961 (for  whatever reason)
+; we need to subtract (61*365 + 14 (leap years))*86400 = 2208988800
+DIFFTIME        EQU     1924905600                      ; difference in seconds to 1.1.1961
+                ; EQU     61*365.25*24*60*60            ; difference in seconds to 1.1.1961
+                sub.l   #DIFFTIME,d7
+                add.l   utcOfs,d7
+                move.l  d7,d1
                 DEBUG   {'Setting time'}
                 QDOSMT$ MT.SCLCK                        ; set the clock
 
@@ -87,16 +101,17 @@ DIFFTIME        EQU     $726CF4E0                       ; difference in seconds 
 errout
                 DEBUG   {'Error exit'}
                 move.l  channelId(a6),a0
-                move.w  UT.ERR,a1
-                jsr     (a1)
+                move.w  UT.ERR,a2
+                jsr     (a2)
                 bra     exitProg
 
 OKExit
                 DEBUG   {'OK exit'}
+                move.l  channelId(a6),a0
                 lea     signoff,a1
-                move.w  (a1)+,d2
-                moveq   #-1,d3
-                QDOSIO$ IO.SSTRG
+                move.w  UT.MTEXT,a2
+                jsr     (a2)
+
 exitProg
                 moveq   #-1,d1
                 move.l  #100,d3                 ; wait 2s for signoff mesg
@@ -124,12 +139,24 @@ sendRequest
                 DEBUG   {'request packet sent'}
                 rts
 
-windowName
-                STRING$ {'con_140x15a1x10'}
-
+windowDef
+                dc.b    4               ; Border
+                dc.b    1               ; border width
+                dc.b    0               ; paper
+                dc.b    7               ; ink
+                dc.w    140
+                dc.w    20
+                dc.w    10
+                dc.w    10
+signon
+                STRING$ {'Q68 NTP Client',10}
+                dc.w    0
+setTime 
+                STRING$ {'Setting time',10}
+                dc.w    0
 signoff
-                STRING$ {'NTP client exiting'}      
-
+                STRING$ {'Time set',10}      
+                dc.w    0
 
 ; The following need to go into a config block later
 maxRetries
@@ -137,11 +164,16 @@ maxRetries
 connectTO       
                 dc.w    10*50                   ; how long (s) to wait for a connection
 hostaddress
-                STRING$ {'udp_192.168.178.3:123'}
-;                STRING$ {'udp_pool.ntp.org:123'}
-  
+;                STRING$ {'udp_192.168.178.3:123'}
+;                STRING$ {'udp_91.229.245.70:123'}
+                STRING$ {'udp_pool.ntp.org:123'}
+                dc.w    0
+
+utcOfs          dc.l    60*60                   ; 1 hour offset
+                dc.w    0
+
 requestPacket
-                dc.l    %00011011000011111111111100000000
+                dc.l    $e3000800
                 dc.l    0,0,0
                 dc.l    0,0,0,0,0,0,0,0
 requestPacketEnd
