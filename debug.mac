@@ -1,0 +1,25 @@
+********************************************************************************************
+* debug_mac
+* Macro to initiate QMON 
+*
+* Initiates debugger via a trap #15 call
+* Adds the reason parameter as a string to the code to act as a beacon (show with D *)
+* Only generates code if active is 1
+*
+********************************************************************************************
+
+
+DEBUG           MACRO   reason
+                EXPAND
+                IFNUM   [NDEBUG] = 1 GOTO NIX
+                trap    #15             ; enter debugger
+                bra.s   .over[.L]       ; jump over beacon
+                dc.b    [reason]
+                ds.w    0
+.over[.L]
+NIX             MACLAB
+                ENDM     
+
+NDEBUG          SETNUM 1                ; NDEBUG is 1 (DEBUG OFF) per default for all modules
+
+ 
