@@ -41,7 +41,8 @@ default: ${MAIN_OBJ} ${OBJS}
   ${LK} ${MAIN_OBJ} link ${LINK_TARGET} ${LINK_OPTIONS}
 clean:
   ${RM} ${MAIN_OBJ} ${OBJS} ${LINK_TARGET} ${MAPFILE} *_bin *_list ram1_err *.list *.rel
-
+zip: ram1_ntp_exe
+  zip -jD ntp_zip ram1_ntp_exe
 #
 # Header file dependencies
 #
