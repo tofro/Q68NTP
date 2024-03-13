@@ -165,15 +165,12 @@ maxRetries
                 dc.w    5
 connectTO       
                 dc.w    10*50                   ; how long (s) to wait for a connection
-;hostaddress
-                EXPAND
- ;               mkcfstr hostAddress,80,{udp_pool.ntp.org:123}
-                NOEXPAND
-                STRING$ {'udp_pool.ntp.org:123'}
-                dc.w    0
 
 utcOfs          dc.l    60*60                   ; 1 hour offset
-                dc.w    0
+             
+summerTimeOfs
+                dc.l    0                       ; summer/winter time offset
+                
 beforeAfter
                 dc.w    0
 

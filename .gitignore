@@ -1,3 +1,6 @@
 .vscode/settings.json
-NTPCLIENT.list
-NTPCLIENT.rel
+*.list
+*.rel
+build
+.vscode
+.gitignore
