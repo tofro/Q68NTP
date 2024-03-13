@@ -13,6 +13,7 @@
                 INCLUDE 'dataspace_in'
                 INCLUDE 'debug_mac'
                 INCLUDE 'generic_mac'
+                INCLUDE 'config_mac'
 
 NDEBUG          SETNUM  0                       ; flag = 1 : "NO DEBUG", and, for consistency ( 8): 
 DEBUG           EQU     0                       ; flag = 1 : Write a log file
@@ -42,7 +43,7 @@ retry
                 beq     errOut
                 moveq   #-1,d1
                 moveq   #IO.SHARE,d3                    ; we're a UDP client
-                lea     hostaddress,a0
+                lea     mxl_hostaddress,a0
                 QDOSOC$ IO.OPEN
           
                 tst.b   d0
@@ -93,7 +94,6 @@ DIFFTIME        EQU     1924992000                      ; difference in seconds 
                 QDOSMT$ MT.SCLCK                        ; set the clock
 
                 bra     OKExit
-
 
 errout
                 DEBUG   {'Error exit'}
@@ -153,23 +153,49 @@ signoff
                 STRING$ {'Time set',10}      
                 dc.w    0
 
-; The following need to go into a config block later
-maxRetries
-                dc.w    5
-connectTO       
-                dc.w    10*50                   ; how long (s) to wait for a connection
-hostaddress
-;                STRING$ {'udp_192.168.178.3:123'}
-;                STRING$ {'udp_91.229.245.70:123'}
-                STRING$ {'udp_pool.ntp.org:123'}
-                dc.w    0
-
-utcOfs          dc.l    60*60                   ; 1 hour offset
-                dc.w    0
 
 requestPacket
                 dc.l    $e3000800
                 dc.l    0,0,0
                 dc.l    0,0,0,0,0,0,0,0
 requestPacketEnd
+
+; The following need to go into a config block later
+maxRetries
+                dc.w    5
+connectTO       
+                dc.w    10*50                   ; how long (s) to wait for a connection
+;hostaddress
+                EXPAND
+ ;               mkcfstr hostAddress,80,{udp_pool.ntp.org:123}
+                NOEXPAND
+                STRING$ {'udp_pool.ntp.org:123'}
+                dc.w    0
+
+utcOfs          dc.l    60*60                   ; 1 hour offset
+                dc.w    0
+beforeAfter
+                dc.w    0
+
+timeout             
+                dc.w    1200
+
+                EXPAND
+
+maxlen          equ     30
+
+;X               EQU     1
+
+                mkcfstr hostAddress,30,{udp_79.133.44.142:123}
+
+configBlk       mkcfhead {NTPClient},{1.0}
+                mkcfitem string,'A',mxl_hostaddress,,,{The host address of the NTP server (dotted quad, udp_ in front)},30     
+                mkcfitem word,'R',maxRetries,,,{Number of retries before giving up (1-5)},1,5
+                mkcfitem word,'T',timeout,,,{Timeout for response (ticks, 1-250)},1,250
+                mkcfitem long,'G',utcOfs,,,{Difference to UTC (s, positive)},0,86400
+                mkcfitem code,'U',beforeAfter,,,{Before or after UTC},0,,{before},1,,{after}
+                mkcfend
+
+name    
+                dc.b    0                
                 END
