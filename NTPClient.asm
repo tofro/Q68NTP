@@ -43,7 +43,7 @@ retry
                 beq     errOut
                 moveq   #-1,d1
                 moveq   #IO.SHARE,d3                    ; we're a UDP client
-                lea     mxl_hostaddress,a0
+                lea     met_hostaddress,a0              ; the mxl label points to maxlen, met_ to string!
                 QDOSOC$ IO.OPEN
           
                 tst.b   d0
@@ -186,13 +186,14 @@ maxlen          equ     30
                 mkcfstr hostAddress,30,{udp_79.133.44.142:123}
 
 configBlk       mkcfhead {NTPClient},{1.0}
-                mkcfitem string,'A',mxl_hostaddress,,,{The host address of the NTP server (dotted quad, udp_ in front)},30     
-                mkcfitem word,'R',maxRetries,,,{Number of retries before giving up (1-5)},1,5
+                mkcfitem string,'A',mxl_hostaddress,,,{The host address of the NTP server (dotted quad, udp_ in front)},30,1,1
+
+                mkcfitem word,'R',maxRetries,,,{Number of retries before giving up (1-6)},1,6
                 mkcfitem word,'T',timeout,,,{Timeout for response (ticks, 1-250)},1,250
                 mkcfitem long,'G',utcOfs,,,{Difference to UTC (s, positive)},0,86400
                 mkcfitem code,'U',beforeAfter,,,{Before or after UTC},0,,{before},1,,{after}
                 mkcfend
 
 name    
-                dc.b    0                
+                dc.w    0                
                 END
