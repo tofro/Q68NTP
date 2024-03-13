@@ -7,6 +7,6 @@ More of a demo on how to write network clients in assembly than an actual progra
 
 Adapt to your likings (NTP server address and your UTC time offset in seconds) at the end.
 
-Minimal functionality: Simply asks the time server for the time, retrieves it and sets the internal clock (NOT the RTC!), ignoring all sub-seconds.
+Minimal functionality: Simply asks the time server for the time, retrieves it and sets the internal clock (NOT the RTC!), ignoring all sub-seconds and round-trip delays.
 
 The program has a level 1 config block that allows you to change some settings
