@@ -23,6 +23,7 @@ CodeStart:
 Start:          JOBSTRT {'NTPClient'},RealStart
                 VERSION {'NTP client for Q68 0.01 alpha'},{'tofro'}
 
+
 RealStart       
                 lea.l   0(a6,a4.l),a6                   ; let a6 point to data space
 
@@ -63,8 +64,7 @@ retrySend
                 tst.b   d0
                 bne.s   retrySend
 
-                lea     connectTO,a0                    ; how long to wait for receiving
-                move.w  (a0),d3
+                move.w  timeout,d3
                 move.l  netChannel(a6),a0
                 lea     packetBuffer(a6),a1
                 move.l  #48,d2 
@@ -88,7 +88,19 @@ recOK
 ; we need to subtract (61*365 + 15 (leap years))*86400 = 1924992000
 DIFFTIME        EQU     1924992000                      ; difference in seconds to 1.1.1961
                 sub.l   #DIFFTIME,d7
-                add.l   utcOfs,d7                       ; add time zone offset (NTP delivers UTC)
+                DEBUG   {'Calculating time'}
+                move.l  utcOfs,d4
+                move.w  beforeAfter,d5                  ; are we + or - GMT?
+                beq.s   west
+                add.l   d4,d7                       ; add time zone offset (NTP delivers UTC)
+                bra.s   overWest
+WEST            sub.l   d4,d7 
+overWest
+                move.w  summerTime,d6
+
+                beq.s   noSummerTime
+                add.l   #3600,d7
+noSummerTime
                 move.l  d7,d1
                 DEBUG   {'Setting time'}
                 QDOSMT$ MT.SCLCK                        ; set the clock
@@ -168,14 +180,14 @@ connectTO
 
 utcOfs          dc.l    60*60                   ; 1 hour offset
              
-summerTimeOfs
-                dc.l    0                       ; summer/winter time offset
+summerTime
+                dc.w    0                       ; summer/winter time
                 
 beforeAfter
-                dc.w    0
+                dc.w    1
 
 timeout             
-                dc.w    1200
+                dc.w    100
 
                 EXPAND
 
@@ -186,14 +198,15 @@ maxlen          equ     30
                 mkcfstr hostAddress,30,{udp_79.133.44.142:123}
 
 configBlk       mkcfhead {NTPClient},{1.0}
-                mkcfitem string,'A',mxl_hostaddress,,,{The host address of the NTP server (dotted quad, udp_ in front)},30,1,1
-
+                mkcfitem string,'A',mxl_hostaddress,,,{The host address of the NTP server (dotted quad, udp_ in front)}
                 mkcfitem word,'R',maxRetries,,,{Number of retries before giving up (1-6)},1,6
                 mkcfitem word,'T',timeout,,,{Timeout for response (ticks, 1-250)},1,250
-                mkcfitem long,'G',utcOfs,,,{Difference to UTC (s, positive)},0,86400
-                mkcfitem code,'U',beforeAfter,,,{Before or after UTC},0,,{before},1,,{after}
+                mkcfitem long,'U',utcOfs,,,{Difference to UTC (s, positive)},0,86400
+                mkcfitem code,'W',beforeAfter,,,{West or East of Greenwich},1,,{West},0,,{East}
+                mkcfitem code,'S',summerTime,,,{Summer Time (yes or no)},1,,{Yes},0,,{No}
                 mkcfend
 
 name    
-                dc.w    0                
+                dc.w    0 
+
                 END

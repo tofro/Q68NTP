@@ -7,7 +7,7 @@
 *******************************************************************************************
                 OFFSET  0
 
-                COMMON DATA
+;                COMMON DATA
 
 channelId       ds.l    1
 netChannel      ds.l    1
