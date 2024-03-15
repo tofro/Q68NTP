@@ -8,5 +8,5 @@ More of a demo on how to write network clients in assembly than an actual progra
 Adapt to your likings (time zone, summer time, timeouts,...) using config or menuconfig
 
 Minimal functionality: Simply asks the time server for the time, retrieves it and sets the internal clock (NOT the RTC!), 
-ignoring all sub-seconds and round-trip delays. 
-If you want the RTC's clock to be set, simply run one of the proper utilities afterwards.
+ignoring all sub-seconds and round-trip delays. If you want the RTC's clock to be set, simply run one of the proper
+utilities afterwards.
